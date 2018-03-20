@@ -4,6 +4,19 @@ var express = require('express');
 var router = express.Router();
 var uuid = require('node-uuid');
 var fs = require('fs');
+var multer  = require('multer');
+var upload  = multer({ dest: 'uploads/' })
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, './uploads/')
+  },
+  filename: function (req, file, cb) {
+    var originalname = file.originalname;
+    var extension = originalname.split(".");
+      cb(null, file.originalname+ '.' + extension)
+  }
+})
 
 router.get('/', function(req, res){
     User.findAll().then(function(user){
@@ -45,6 +58,22 @@ router.post('/recipe', function(req, res){
   Recipe.ingredient = req.query.ingredient,
   Recipe.description = req.query.description,
   Recipe.userId = req.query.userId,
+  Recipe.save().then(function(Recipe){
+    res.json(Recipe);
+    res.end();
+
+  })
+
+});
+
+router.post('/recipeupload', upload.single('photo'), function (req, res) {
+  console.log(req);
+  var Recipe = recipe.build();
+  Recipe.name = req.body.recipeName,
+  Recipe.image = req.file.filename,
+  Recipe.ingredient = req.body.recipeingredient,
+  Recipe.description = req.body.recipedescription,
+  Recipe.userId = req.body.userid,
   Recipe.save().then(function(Recipe){
     res.json(Recipe);
     res.end();

@@ -6,6 +6,8 @@ var app = express();
 GLOBAL.http = require('http').Server(app);
 var bodyParser = require('body-parser');
 
+var path = require('path');
+
 require('./models/models.js')
 
 //CONTROLLERS
@@ -18,17 +20,19 @@ app.use(bodyParser.urlencoded({limit: '50mb', extended: true }));
 app.use(bodyParser.json({limit: '50mb'}));
 
 app.all('/*', function(req, res, next) {
-  	res.setHeader('Access-Control-Allow-Origin', "*");
-  	res.setHeader('Access-Control-Allow-Headers', "Content-Type");
+	res.setHeader('Access-Control-Allow-Origin', "*");
+	res.setHeader('Access-Control-Allow-Credentials', true);
+  	res.setHeader('Access-Control-Allow-Headers', "Origin, X-Requested-With, Content-Type, Accept");
   	res.setHeader('Access-Control-Allow-Methods','GET,PUT,POST,DELETE,OPTIONS');
   	next();
 });
 
 app.use('/user', UserRouter);
-
+app.use(express.static(path.resolve('./uploads')));
+app.use("/uploads",express.static(__dirname + '/uploads'));
 
 app.get('/', function(req, res){
-    res.send("welcome to recipe API");
+    res.json("welcome to recipe API");
     res.end();
 });
 
